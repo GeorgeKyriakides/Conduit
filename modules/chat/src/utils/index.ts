@@ -95,6 +95,12 @@ export async function sendInvitations(
   return 'Invitations sent';
 }
 
+/**
+ * Normalizes populate query parameters to an array of strings.
+ *
+ * @param {string | string[] | undefined} pop The populate value(s).
+ * @returns {(string | string[] | undefined)} Normalized array or original value if undefined.
+ */
 export function populateArray(pop: string | string[] | undefined) {
   if (!pop) return pop;
   if (typeof pop === 'string' && pop.indexOf(',') !== -1) {

@@ -3,6 +3,12 @@ import {
   ISendNotificationToManyDevices,
 } from '../../interfaces/ISendNotification.js';
 
+/**
+ * Validates a notification payload ensuring silent notifications meet requirements.
+ *
+ * @param {ISendNotification | ISendNotificationToManyDevices} notification Notification object to validate.
+ * @returns {boolean} True when the notification is valid.
+ */
 export function validateNotification(
   notification: ISendNotification | ISendNotificationToManyDevices,
 ) {
