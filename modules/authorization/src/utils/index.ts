@@ -54,6 +54,16 @@ export const constructObjectIndex = (
   };
 };
 
+/**
+ * Generates a SQL query fetching an access list for Postgres databases.
+ *
+ * @param {string} objectTypeCollection Collection to query.
+ * @param {string} computedTuple Computed permission tuple.
+ * @param {string} subject Subject identifier.
+ * @param {string} objectType Object type.
+ * @param {string} action Action being checked.
+ * @returns {string} The generated SQL query.
+ */
 export function getPostgresAccessListQuery(
   objectTypeCollection: string,
   computedTuple: string,
@@ -81,6 +91,16 @@ export function getPostgresAccessListQuery(
   `;
 }
 
+/**
+ * Generates a SQL query fetching an access list for generic SQL databases.
+ *
+ * @param {string} objectTypeCollection Collection to query.
+ * @param {string} computedTuple Computed permission tuple.
+ * @param {string} subject Subject identifier.
+ * @param {string} objectType Object type.
+ * @param {string} action Action being checked.
+ * @returns {string} The generated SQL query.
+ */
 export function getSQLAccessListQuery(
   objectTypeCollection: string,
   computedTuple: string,

@@ -8,6 +8,12 @@ import { randomUUID } from 'node:crypto';
 import { ConfigController } from '@conduitplatform/module-tools';
 import { status } from '@grpc/grpc-js';
 
+/**
+ * Converts a readable stream into a single {@link Buffer}.
+ *
+ * @param {NodeJS.ReadableStream} readableStream The stream to buffer.
+ * @returns {Promise<Buffer>} Promise resolving with the buffered data.
+ */
 export async function streamToBuffer(readableStream: any): Promise<Buffer> {
   return new Promise((resolve, reject) => {
     const chunks: Buffer[] = [];
@@ -23,6 +29,13 @@ export async function streamToBuffer(readableStream: any): Promise<Buffer> {
   });
 }
 
+/**
+ * Retrieves the AWS account id using the provided configuration.
+ * When a custom endpoint is used, a random uuid is returned instead.
+ *
+ * @param {StorageConfig} config Storage configuration containing AWS credentials.
+ * @returns {Promise<string>} The AWS account identifier.
+ */
 export async function getAwsAccountId(config: StorageConfig) {
   // when using non AWS S3 storage provider
   if (config.aws.endpoint) {
@@ -43,6 +56,12 @@ export async function getAwsAccountId(config: StorageConfig) {
   return userId;
 }
 
+/**
+ * Ensures folder paths have a leading and trailing slash and are normalized.
+ *
+ * @param {string} [folderPath] Path to normalize.
+ * @returns {string} Normalized folder path.
+ */
 export function normalizeFolderPath(folderPath?: string) {
   if (!folderPath || folderPath.trim() === '' || folderPath.trim() === '/') return '/';
   return `${path.normalize(folderPath.trim()).replace(/^\/|\/$/g, '')}/`;
@@ -64,6 +83,12 @@ function getNestedPaths(inputPath: string): string[] {
   return paths;
 }
 
+/**
+ * Iteratively calls the provided handler for each segment of an input path.
+ *
+ * @param {string} inputPath Path to iterate over.
+ * @param {(inputPath: string, isLast: boolean) => Promise<void>} handler Function invoked for each path segment.
+ */
 export async function deepPathHandler(
   inputPath: string,
   handler: (inputPath: string, isLast: boolean) => Promise<void>,
@@ -74,6 +99,13 @@ export async function deepPathHandler(
   }
 }
 
+/**
+ * Stores a new file using the given provider and persists it in the database.
+ *
+ * @param {IStorageProvider} storageProvider Provider to store the file with.
+ * @param {IFileParams} params Parameters describing the file.
+ * @returns {Promise<File>} The created file document.
+ */
 export async function storeNewFile(
   storageProvider: IStorageProvider,
   params: IFileParams,
@@ -100,6 +132,13 @@ export async function storeNewFile(
   });
 }
 
+/**
+ * Creates a file entry and generates an upload URL for direct uploads.
+ *
+ * @param {IStorageProvider} storageProvider Provider to generate the URL from.
+ * @param {IFileParams} params File parameters.
+ * @returns {Promise<{ file: File; url: string }>} The created file and upload URL.
+ */
 export async function _createFileUploadUrl(
   storageProvider: IStorageProvider,
   params: IFileParams,
@@ -133,6 +172,14 @@ export async function _createFileUploadUrl(
   };
 }
 
+/**
+ * Updates a file both on the storage provider and in the database.
+ *
+ * @param {IStorageProvider} storageProvider Provider holding the file.
+ * @param {File} file Existing file document.
+ * @param {IFileParams} params Updated file parameters.
+ * @returns {Promise<File>} The updated file document.
+ */
 export async function _updateFile(
   storageProvider: IStorageProvider,
   file: File,
@@ -166,6 +213,14 @@ export async function _updateFile(
   return updatedFile;
 }
 
+/**
+ * Updates a file entry and generates a new upload URL when needed.
+ *
+ * @param {IStorageProvider} storageProvider Provider to generate the URL from.
+ * @param {File} file Existing file document.
+ * @param {IFileParams} params Updated parameters.
+ * @returns {Promise<{ file: File; url: string }>} Updated file and upload URL.
+ */
 export async function _updateFileUploadUrl(
   storageProvider: IStorageProvider,
   file: File,
@@ -214,6 +269,12 @@ export async function _updateFileUploadUrl(
   return { file: updatedFile!, url: uploadUrl };
 }
 
+/**
+ * Updates Prometheus metrics for storage size when a file changes.
+ *
+ * @param {number} currentSize The previous file size in bytes.
+ * @param {number} newSize The new file size in bytes.
+ */
 export function updateFileMetrics(currentSize: number, newSize: number) {
   const fileSizeDiff = Math.abs(currentSize - newSize);
   fileSizeDiff < 0
@@ -221,6 +282,14 @@ export function updateFileMetrics(currentSize: number, newSize: number) {
     : ConduitGrpcSdk.Metrics?.decrement('storage_size_bytes_total', fileSizeDiff);
 }
 
+/**
+ * Validates and possibly modifies a file name to avoid conflicts.
+ *
+ * @param {string | undefined} name Desired file name.
+ * @param {string} folder Folder where the file will reside.
+ * @param {string} container Storage container/bucket.
+ * @returns {Promise<string>} A valid and possibly suffixed file name.
+ */
 export async function validateName(
   name: string | undefined,
   folder: string,
